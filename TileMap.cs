@@ -99,6 +99,26 @@ public class TileMap : MonoBehaviour {
 				{
 					graph[x,y].neighbours.Add( graph[x,y+1] );
 				}
+
+				/* Diagonals */
+
+				if( x > 0 && y > 0 )
+				{
+					graph[x,y].neighbours.Add( graph[x-1,y-1] );
+				}
+				if( x < mapSizeX-1 && y < mapSizeX-1 )
+				{
+					graph[x,y].neighbours.Add( graph[x+1,y+1] );
+				}
+				
+				if( y > 0 && x < mapSizeX-1 )
+				{
+					graph[x,y].neighbours.Add( graph[x+1,y-1] );
+				}
+				if( y < mapSizeY-1 && x > 0 )
+				{
+					graph[x,y].neighbours.Add( graph[x-1,y+1] );
+				}
 			}
 		}
 	}
@@ -125,6 +145,7 @@ public class TileMap : MonoBehaviour {
 
 	public void GeneratePathTo(int x, int y)
 	{
+		unit.GetComponent<Unit> ().currentPath = null;
 		currentPath = null;
 
 		/* Implementing Dijkstras Algorithm */
@@ -201,12 +222,40 @@ public class TileMap : MonoBehaviour {
 
 			currentPath.Reverse();
 		}
+
+		unit.GetComponent<Unit> ().currentPath = currentPath;
 	}
+
+	/* Start Imbricated Class */
+	/* The class was added here in order to make it accesible from another script */
+	/* Refactoring needed */
+	public class Node
+	{
+		public List<Node> neighbours; // The edges
+		public int x;
+		public int y;
+		
+		public Node()
+		{
+			neighbours = new List<Node>();
+		}
+		
+		public float DistanceTo(Node otherNode)
+		{
+			if(otherNode == null)
+			{
+				Debug.Log("Null other node!");
+			}
+			return Vector2.Distance ( new Vector2(x,y) , new Vector2(otherNode.x,otherNode.y) );
+		}
+	}
+	/* End Imbricated Class */
 }
 
+/*
 public class Node
 {
-	public List<Node> neighbours; /* The edges */
+	public List<Node> neighbours; // The edges
 	public int x;
 	public int y;
 
@@ -224,3 +273,4 @@ public class Node
 		return Vector2.Distance ( new Vector2(x,y) , new Vector2(otherNode.x,otherNode.y) );
 	}
 }
+*/
