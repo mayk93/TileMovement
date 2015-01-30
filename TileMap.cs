@@ -3,6 +3,14 @@ using System.Collections;
 
 public class TileMap : MonoBehaviour {
 
+	/*
+		Grassland - 0
+		Swamp - 1
+		Mountain - 2
+	*/
+
+	public GameObject unit;
+
 	public TileType[] tileTypes;
 	int[,] tiles;
 
@@ -24,7 +32,6 @@ public class TileMap : MonoBehaviour {
 	void GenerateMapData()
 	{
 		tiles = new int[mapSizeX,mapSizeY];
-
 
 		/* Default to grassland */
 		for(int x = 0; x < mapSizeX; x++)
@@ -71,8 +78,17 @@ public class TileMap : MonoBehaviour {
 		{
 			for (int y = 0; y < mapSizeY; y++)
 			{
-				Instantiate( tileTypes[tiles[x,y]].tilleVisualPrefab , new Vector3(x,y,0), Quaternion.identity);
+				GameObject instantiatedTile = (GameObject)Instantiate( tileTypes[tiles[x,y]].tilleVisualPrefab , new Vector3(x,y,0), Quaternion.identity);
+				ClickHandler instantiatedTileClickHandler = instantiatedTile.GetComponent<ClickHandler>();
+				instantiatedTileClickHandler.tileX = x;
+				instantiatedTileClickHandler.tileY = y;
+				instantiatedTileClickHandler.map = this;
 			}
 		}
+	}
+
+	public void MoveUnitTo(int x, int y)
+	{
+		unit.transform.position = new Vector3(x,y,0);
 	}
 }
