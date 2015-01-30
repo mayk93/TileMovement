@@ -87,8 +87,17 @@ public class TileMap : MonoBehaviour {
 		}
 	}
 
+	public Vector3 TileCoordinatesToWorldCoordinates(int x, int y)
+	{
+		return new Vector3 (x, y, 0);
+	}
+
 	public void MoveUnitTo(int x, int y)
 	{
-		unit.transform.position = new Vector3(x,y,0);
+		/* Unit Data */
+		unit.GetComponent<Unit> ().tileX = x;
+		unit.GetComponent<Unit> ().tileY = y;
+		/* Visual Movement */
+		unit.transform.position = TileCoordinatesToWorldCoordinates(x,y);
 	}
 }
