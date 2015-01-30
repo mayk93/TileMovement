@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class TileMap : MonoBehaviour {
 
@@ -17,10 +19,13 @@ public class TileMap : MonoBehaviour {
 	int mapSizeX = 10;
 	int mapSizeY = 10;
 
+	Node[,] graph;
+
 	// Use this for initialization
 	void Start () 
 	{
 		GenerateMapData ();
+		GenerateGraph ();
 		GenerateMapVisuals ();
 	}
 	
@@ -42,31 +47,48 @@ public class TileMap : MonoBehaviour {
 			}
 		}
 
-		/* Old, hardcoded generation for test */
-		/*
-		tiles [0, 3] = 2;
-		tiles [0, 2] = 2;
-		tiles [0, 1] = 2;
-		tiles [0, 0] = 2;
-		
-		tiles [1, 0] = 2;
-		tiles [2, 0] = 2;
-		
-		tiles [3, 3] = 2;
-		tiles [3, 2] = 2;
-		tiles [3, 1] = 2;
-		tiles [3, 0] = 2;
-		*/
-
-		for( int x = 0; x < mapSizeX; x++ )
+		for( int x = 1; x < mapSizeX; x++ )
 		{
-			for( int y = 0; y < mapSizeY; y++ )
+			for( int y = 1; y < mapSizeY; y++ )
 			{
 				/* Change half the tiles */
 				/* Used 2 because Random.Range has exclusive max */
 				if( Random.Range(0,2) == 0 )
 				{
 					tiles[x,y] = Random.Range(1,3);
+				}
+			}
+		}
+	}
+
+	void GenerateGraph()
+	{
+		graph = new Node[mapSizeX, mapSizeY];
+
+		for (int x = 0; x < mapSizeX; x++) 
+		{
+			for (int y = 0; y < mapSizeY; y++)
+			{
+				graph[x,y].x = x;
+				graph[x,y].y = y;
+
+				/* To Add Diagonals */
+				if( x > 0 )
+				{
+					graph[x,y].neighbours.Add( graph[x-1,y] );
+				}
+				if( x < mapSizeX-1 )
+				{
+					graph[x,y].neighbours.Add( graph[x+1,y] );
+				}
+
+				if( y > 0 )
+				{
+					graph[x,y].neighbours.Add( graph[x,y-1] );
+				}
+				if( y < mapSizeY-1 )
+				{
+					graph[x,y].neighbours.Add( graph[x,y+1] );
 				}
 			}
 		}
@@ -94,10 +116,69 @@ public class TileMap : MonoBehaviour {
 
 	public void MoveUnitTo(int x, int y)
 	{
-		/* Unit Data */
+		/*
+		// Unit Data
 		unit.GetComponent<Unit> ().tileX = x;
 		unit.GetComponent<Unit> ().tileY = y;
-		/* Visual Movement */
+		// Visual Movement
 		unit.transform.position = TileCoordinatesToWorldCoordinates(x,y);
+		*/
+
+		/* Implementing Dijkstras Algorithm */
+		Dictionary<Node,float> distance = new Dictionary<Node,float>();
+		Dictionary<Node,Node> previous = new Dictionary<Node,Node>();
+
+		List<Node> unvisitedNodes = new List<Node>();
+
+		Node source = graph[unit.GetComponent<Unit>().tileX,unit.GetComponent<Unit>().tileY];
+		Node target = graph[x,y];
+
+		distance [source] = 0;
+		previous [source] = null;
+
+		/* Initialize with infinity if not soource ( as in we don't know the distance ) */
+		foreach (Node graphNode in graph) 
+		{
+			if(graphNode != source)
+			{
+				distance[graphNode] = Mathf.Infinity;
+				previous[graphNode] = null;
+			}
+
+			unvisitedNodes.Add(graphNode);
+		}
+
+		while (unvisitedNodes.Count > 0) 
+		{
+			Node currentlyVisiting = unvisitedNodes.OrderBy( nodeDistance => distance[nodeDistance] ).First();
+			unvisitedNodes.Remove(currentlyVisiting);
+
+			foreach(Node neighbour in currentlyVisiting.neighbours)
+			{
+				float alt = distance[currentlyVisiting] + currentlyVisiting.DistanceTo(neighbour);
+				if ( alt < distance[neighbour] )
+				{
+					distance[neighbour] = alt;
+					previous[neighbour] = currentlyVisiting;
+				}
+			}
+		}
+	}
+}
+
+public class Node
+{
+	public List<Node> neighbours; /* The edges */
+	public int x;
+	public int y;
+
+	public Node()
+	{
+		neighbours = new List<Node>();
+	}
+
+	public float DistanceTo(Node otherNode)
+	{
+		return Vector2.Distance ( new Vector2(x,y) , new Vector2(otherNode.x,otherNode.y) );
 	}
 }
