@@ -21,6 +21,8 @@ public class TileMap : MonoBehaviour {
 
 	Node[,] graph;
 
+	List<Node> currentPath = null;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -69,9 +71,16 @@ public class TileMap : MonoBehaviour {
 		{
 			for (int y = 0; y < mapSizeY; y++)
 			{
+				graph[x,y] = new Node();
 				graph[x,y].x = x;
 				graph[x,y].y = y;
+			}
+		}
 
+		for (int x = 0; x < mapSizeX; x++) 
+		{
+			for (int y = 0; y < mapSizeY; y++)
+			{
 				/* To Add Diagonals */
 				if( x > 0 )
 				{
@@ -114,15 +123,9 @@ public class TileMap : MonoBehaviour {
 		return new Vector3 (x, y, 0);
 	}
 
-	public void MoveUnitTo(int x, int y)
+	public void GeneratePathTo(int x, int y)
 	{
-		/*
-		// Unit Data
-		unit.GetComponent<Unit> ().tileX = x;
-		unit.GetComponent<Unit> ().tileY = y;
-		// Visual Movement
-		unit.transform.position = TileCoordinatesToWorldCoordinates(x,y);
-		*/
+		currentPath = null;
 
 		/* Implementing Dijkstras Algorithm */
 		Dictionary<Node,float> distance = new Dictionary<Node,float>();
@@ -150,7 +153,23 @@ public class TileMap : MonoBehaviour {
 
 		while (unvisitedNodes.Count > 0) 
 		{
-			Node currentlyVisiting = unvisitedNodes.OrderBy( nodeDistance => distance[nodeDistance] ).First();
+			/* This is very inefficient */
+			//Node currentlyVisiting = unvisitedNodes.OrderBy( nodeDistance => distance[nodeDistance] ).First();
+			/* This is better - but still suboptimal */
+			Node currentlyVisiting = null;
+			foreach(Node candidateNode in unvisitedNodes)
+			{
+				if ( currentlyVisiting == null || distance[candidateNode] < distance[currentlyVisiting] )
+				{
+					currentlyVisiting = candidateNode;
+				}
+			}
+
+			if (currentlyVisiting == target)
+			{
+				break;
+			}
+
 			unvisitedNodes.Remove(currentlyVisiting);
 
 			foreach(Node neighbour in currentlyVisiting.neighbours)
@@ -162,6 +181,25 @@ public class TileMap : MonoBehaviour {
 					previous[neighbour] = currentlyVisiting;
 				}
 			}
+		}
+
+		/* In this case, there is no route */
+		if (distance [target] == Mathf.Infinity || previous [target] == null) 
+		{
+			return;
+		} 
+		else 
+		{
+			/* Here I "backtrack" from the target to the source, creating the path */
+			currentPath = new List<Node>();
+			Node current = target;
+			while(current != null)
+			{
+				currentPath.Add(current);
+				current = previous[current];
+			}
+
+			currentPath.Reverse();
 		}
 	}
 }
@@ -179,6 +217,10 @@ public class Node
 
 	public float DistanceTo(Node otherNode)
 	{
+		if(otherNode == null)
+		{
+			Debug.Log("Null other node!");
+		}
 		return Vector2.Distance ( new Vector2(x,y) , new Vector2(otherNode.x,otherNode.y) );
 	}
 }

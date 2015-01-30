@@ -25,6 +25,6 @@ public class ClickHandler : MonoBehaviour {
 		Debug.Log (tileY);
 		*/
 
-		map.MoveUnitTo (tileX, tileY);
+		map.GeneratePathTo (tileX, tileY);
 	}
 }
