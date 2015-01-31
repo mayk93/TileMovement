@@ -21,6 +21,10 @@ public class Unit : MonoBehaviour {
 	float movementSpeed = 5f;
 	*/
 
+	//Part of the new code
+	float epsilon = 0.1f;
+	float movementSpeed = 5f;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -48,6 +52,8 @@ public class Unit : MonoBehaviour {
 				currentNode++;
 			}
 		}
+
+		visualMovement ();
 
 		/* This will be called via the move button */
 		//MoveToNextTile ();
@@ -100,8 +106,10 @@ public class Unit : MonoBehaviour {
 			{
 				// The first node is the tile we are allready standing on.
 				currentPath.RemoveAt (0);
-				
-				transform.position = map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y);
+
+				// Old new movement ( Part of the new code, before improvement )
+				//transform.position = map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y);
+
 				tileX = currentPath[0].x;
 				tileY = currentPath[0].y;
 
@@ -109,6 +117,7 @@ public class Unit : MonoBehaviour {
 
 				if(currentPath.Count == 1)
 				{
+					transform.position = map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y);
 					currentPath = null;
 				}
 			}
@@ -116,6 +125,21 @@ public class Unit : MonoBehaviour {
 			{
 				remainingMovementPoints = 0;
 			}
+		}
+	}
+
+	public void visualMovement()
+	{
+		try
+		{
+			if ( currentPath != null )
+			{
+				transform.position = Vector3.Lerp(transform.position,map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y),Time.deltaTime*movementSpeed);
+			}
+		}
+		catch
+		{
+			Debug.Log("VM catch");
 		}
 	}
 }

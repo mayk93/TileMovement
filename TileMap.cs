@@ -73,6 +73,20 @@ public class TileMap : MonoBehaviour {
 			}
 		}
 
+		/* To Remove - Test purposes */
+		/*
+		tiles[5,7] = 2;
+		tiles[5,6] = 2;
+		tiles[5,5] = 2;
+
+		tiles[6,7] = 2;
+		tiles[6,6] = 0;
+		tiles[6,5] = 2;
+
+		tiles[7,7] = 2;
+		tiles[7,6] = 2;
+		tiles[7,5] = 2;
+		*/
 
 		/*
 		// Default to grassland
