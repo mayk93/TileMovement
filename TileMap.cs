@@ -40,6 +40,19 @@ public class TileMap : MonoBehaviour {
 	{
 	}
 
+	/* This overload in not neceary */
+	float CostToEnterTile(int x , int y)
+	{
+		TileType currentTileType = tileTypes[ tiles[x,y] ];
+		return currentTileType.movementCost;
+	}
+
+	float CostToEnterTile(Node toEnter)
+	{
+		TileType currentTileType = tileTypes[ tiles[toEnter.x,toEnter.y] ];
+		return currentTileType.movementCost;
+	}
+
 	void GenerateMapData()
 	{
 		tiles = new int[mapSizeX,mapSizeY];
@@ -199,7 +212,8 @@ public class TileMap : MonoBehaviour {
 
 			foreach(Node neighbour in currentlyVisiting.neighbours)
 			{
-				float alt = distance[currentlyVisiting] + currentlyVisiting.DistanceTo(neighbour);
+				//float alt = distance[currentlyVisiting] + currentlyVisiting.DistanceTo(neighbour);
+				float alt = distance[currentlyVisiting] + currentlyVisiting.DistanceTo(neighbour) + CostToEnterTile(neighbour);
 				if ( alt < distance[neighbour] )
 				{
 					distance[neighbour] = alt;
