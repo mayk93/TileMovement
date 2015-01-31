@@ -46,34 +46,60 @@ public class Unit : MonoBehaviour {
 			}
 		}
 
+		MoveToNextTile ();
+
 		/* This needs heavy reworking */
 		/* This is the old code */
 		/*
 		if(currentPath != null)
-		{
-			if(currentPath[currentNode] != null)
+		{	
+			try
 			{
-				transform.position = new Vector3( Mathf.Lerp(transform.position.x,currentPath[currentNode].x,Time.deltaTime*movementSpeed) , Mathf.Lerp(transform.position.y,currentPath[currentNode].y,Time.deltaTime*movementSpeed) , 0 );
-			}
-		
-			if( Mathf.Abs( transform.position.x - currentPath[currentNode].x ) < epsilon && Mathf.Abs( transform.position.y - currentPath[currentNode].y ) < epsilon )
-			{
-				try
+				if(currentPath[currentNode] != null && currentPath != null)
 				{
-					tileX = currentPath[currentNode].x;
-					tileY = currentPath[currentNode].y;
-					if(currentPath[currentNode+1] != null)
+					transform.position = new Vector3( Mathf.Lerp(transform.position.x,currentPath[currentNode].x,Time.deltaTime*movementSpeed) , Mathf.Lerp(transform.position.y,currentPath[currentNode].y,Time.deltaTime*movementSpeed) , 0 );
+				}
+			
+				if( Mathf.Abs( transform.position.x - currentPath[currentNode].x ) < epsilon && Mathf.Abs( transform.position.y - currentPath[currentNode].y ) < epsilon && currentPath != null )
+				{
+					try
 					{
-						currentNode = currentNode + 1;
+						tileX = currentPath[currentNode].x;
+						tileY = currentPath[currentNode].y;
+						if(currentPath[currentNode+1] != null)
+						{
+							currentNode = currentNode + 1;
+						}
+					}
+					catch
+					{
+						currentPath = null;
+						currentNode = 0;
 					}
 				}
-				catch
-				{
-					currentPath = null;
-					currentNode = 0;
-				}
+			}
+			catch
+			{
+				currentPath = null;
+				currentNode = 0;
 			}
 		}
 		*/
+	}
+
+	public void MoveToNextTile()
+	{
+		if(currentPath != null)
+		{
+			// The first node is the tile we are allready standing on.
+			currentPath.RemoveAt (0);
+			
+			transform.position = map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y);
+
+			if(currentPath.Count == 1)
+			{
+				currentPath = null;
+			}
+		}
 	}
 }
