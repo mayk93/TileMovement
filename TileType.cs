@@ -8,5 +8,5 @@ public class TileType {
 	public GameObject tilleVisualPrefab;
 
 	public float movementCost = 1f;
-	//public bool isWalkable = true;
+	public bool isWalkable = true;
 }

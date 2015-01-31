@@ -43,6 +43,12 @@ public class TileMap : MonoBehaviour {
 	public float CostToEnterTile(Node toEnter)
 	{
 		TileType currentTileType = tileTypes[ tiles[toEnter.x,toEnter.y] ];
+
+		if(TileCanBeEntered(toEnter.x,toEnter.y) == false)
+		{
+			return Mathf.Infinity;
+		}
+
 		return currentTileType.movementCost;
 	}
 
@@ -50,7 +56,26 @@ public class TileMap : MonoBehaviour {
 	{
 		tiles = new int[mapSizeX,mapSizeY];
 
-		/* Default to grassland */
+		// New Map Generation
+		for(int x = 0; x < mapSizeX; x++)
+		{
+			for (int y = 0; y < mapSizeY; y++)
+			{
+				// If at start, make grassland, so we don't start in a mountain
+				if(x == 0 && y == 0)
+				{
+					tiles[x,y] = 0;
+				}
+				else
+				{
+					tiles[x,y] = Random.Range(0,3);
+				}
+			}
+		}
+
+
+		/*
+		// Default to grassland
 		for(int x = 0; x < mapSizeX; x++)
 		{
 			for (int y = 0; y < mapSizeY; y++)
@@ -63,14 +88,15 @@ public class TileMap : MonoBehaviour {
 		{
 			for( int y = 1; y < mapSizeY; y++ )
 			{
-				/* Change half the tiles */
-				/* Used 2 because Random.Range has exclusive max */
+				// Change half the tiles
+				// Used 2 because Random.Range has exclusive max
 				if( Random.Range(0,2) == 0 )
 				{
 					tiles[x,y] = Random.Range(1,3);
 				}
 			}
 		}
+		*/
 	}
 
 	void GenerateGraph()
@@ -153,10 +179,20 @@ public class TileMap : MonoBehaviour {
 		return new Vector3 (x, y, 0);
 	}
 
+	public bool TileCanBeEntered(int x, int y)
+	{
+		return tileTypes[tiles[x,y]].isWalkable;
+	}
+
 	public void GeneratePathTo(int x, int y)
 	{
 		unit.GetComponent<Unit> ().currentPath = null;
 		currentPath = null;
+
+		if(TileCanBeEntered(x,y) == false)
+		{
+			return;
+		}
 
 		/* Implementing Dijkstras Algorithm */
 		Dictionary<Node,float> distance = new Dictionary<Node,float>();
