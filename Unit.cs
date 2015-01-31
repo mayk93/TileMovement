@@ -12,6 +12,8 @@ public class Unit : MonoBehaviour {
 
 	public TileMap map;
 
+	public float movementPoints;
+
 	//Part of the old code
 	/*
 	int currentNode;
@@ -22,6 +24,7 @@ public class Unit : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		movementPoints = 2f;
 		//Part of the old code
 		/*
 		currentNode = 0;
@@ -46,7 +49,8 @@ public class Unit : MonoBehaviour {
 			}
 		}
 
-		MoveToNextTile ();
+		/* This will be called via the move button */
+		//MoveToNextTile ();
 
 		/* This needs heavy reworking */
 		/* This is the old code */
@@ -89,16 +93,28 @@ public class Unit : MonoBehaviour {
 
 	public void MoveToNextTile()
 	{
-		if(currentPath != null)
+		float remainingMovementPoints = movementPoints;
+		while(remainingMovementPoints > 0)
 		{
-			// The first node is the tile we are allready standing on.
-			currentPath.RemoveAt (0);
-			
-			transform.position = map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y);
-
-			if(currentPath.Count == 1)
+			if(currentPath != null)
 			{
-				currentPath = null;
+				// The first node is the tile we are allready standing on.
+				currentPath.RemoveAt (0);
+				
+				transform.position = map.TileCoordinatesToWorldCoordinates(currentPath[0].x, currentPath[0].y);
+				tileX = currentPath[0].x;
+				tileY = currentPath[0].y;
+
+				remainingMovementPoints = remainingMovementPoints - map.CostToEnterTile(currentPath[0]);
+
+				if(currentPath.Count == 1)
+				{
+					currentPath = null;
+				}
+			}
+			else
+			{
+				remainingMovementPoints = 0;
 			}
 		}
 	}

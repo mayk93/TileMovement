@@ -40,14 +40,7 @@ public class TileMap : MonoBehaviour {
 	{
 	}
 
-	/* This overload in not neceary */
-	float CostToEnterTile(int x , int y)
-	{
-		TileType currentTileType = tileTypes[ tiles[x,y] ];
-		return currentTileType.movementCost;
-	}
-
-	float CostToEnterTile(Node toEnter)
+	public float CostToEnterTile(Node toEnter)
 	{
 		TileType currentTileType = tileTypes[ tiles[toEnter.x,toEnter.y] ];
 		return currentTileType.movementCost;
