@@ -10,21 +10,45 @@ public class Unit : MonoBehaviour {
 
 	public List<TileMap.Node> currentPath = null;
 
+	public TileMap map;
+
+	//Part of the old code
+	/*
 	int currentNode;
 	float epsilon;
-
 	float movementSpeed = 5f;
+	*/
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
+		//Part of the old code
+		/*
 		currentNode = 0;
 		epsilon = 0.1f;
+		*/
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
+		if(currentPath != null)
+		{
+			int currentNode = 0;
+			while( currentNode < currentPath.Count-1 )
+			{
+				Vector3 start = map.TileCoordinatesToWorldCoordinates( currentPath[currentNode].x , currentPath[currentNode].y ) + new Vector3(0,0,-1f);
+				Vector3 end = map.TileCoordinatesToWorldCoordinates( currentPath[currentNode + 1].x , currentPath[currentNode+1].y ) + new Vector3(0,0,-1f);
+
+				Debug.DrawLine(start,end,Color.red);
+
+				currentNode++;
+			}
+		}
+
 		/* This needs heavy reworking */
+		/* This is the old code */
+		/*
 		if(currentPath != null)
 		{
 			if(currentPath[currentNode] != null)
@@ -50,5 +74,6 @@ public class Unit : MonoBehaviour {
 				}
 			}
 		}
+		*/
 	}
 }

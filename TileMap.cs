@@ -26,14 +26,18 @@ public class TileMap : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		unit.GetComponent<Unit> ().tileX = (int)unit.transform.position.x;
+		unit.GetComponent<Unit> ().tileY = (int)unit.transform.position.y;
+		unit.GetComponent<Unit> ().map = this;
+
 		GenerateMapData ();
 		GenerateGraph ();
 		GenerateMapVisuals ();
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update () 
+	{
 	}
 
 	void GenerateMapData()
